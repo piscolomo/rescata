@@ -29,7 +29,15 @@ scope do
     assert_equal User.new.get_talks, "rescued!"
   end
 
-  test "raise error if error class sent is not a valid class" do
+  test "raise error if error class sent is not a class" do
+    assert_raise(ArgumentError) do
+      class User
+        rescata :get_talks, with: :rescue_get_talks, in: "whatever"
+      end
+    end
+  end
+
+  test "raise error if error class sent is not a Exception class or subclass" do
     assert_raise(ArgumentError) do
       class User
         rescata :get_talks, with: :rescue_get_talks, in: User
