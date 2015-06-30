@@ -4,7 +4,9 @@ module Rescata
   end
 
   module ClassMethods
-    def rescata
+    def rescata(method_name, options = {})
+      puts method_name
+      puts options
     end
   end
 end

@@ -4,7 +4,15 @@ scope do
   class User
     include Rescata
 
-    rescata
+    rescata :get_talks, with: :rescue_get_talks
+
+    def get_talks
+      raise "throwing an error!"
+    end
+
+    def rescue_get_talks
+      puts "rescued!"
+    end
   end
 
   test "testing..." do

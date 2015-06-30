@@ -1,5 +1,5 @@
 # rescata
-Microlibrary for rescue exceptions declaratively
+Microlibrary for rescue exceptions declaratively for your Ruby classes.
 
 Still in development...
 
@@ -28,7 +28,7 @@ end
 ### Rescuing multiple methods at once
 
 ```ruby
-rescata :get_talks, :other_method, with: :rescue_method
+rescata methods: [:get_talks, :other_method], with: :rescue_method
 ```
 
 ### Ensure actions
