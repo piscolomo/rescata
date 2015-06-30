@@ -14,9 +14,17 @@ scope do
 
   test "raise error if rescuer method is not sent" do
     assert_raise(ArgumentError) do
-      class User
+      Class.new(User) do
+        include Rescata
         rescata :get_talks
       end
+    end
+  end
+
+  test "rescue an error" do
+    Class.new(User) do
+      include Rescata
+      rescata :get_talks, with: :rescue_get_talks
     end
   end
 end
