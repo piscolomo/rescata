@@ -5,8 +5,7 @@ module Rescata
 
   module ClassMethods
     def rescata(method_name, options = {})
-      puts method_name
-      puts options
+      raise ArgumentError, 'Rescuer method was not found, supply it with a hash with key :with as an argument' unless options[:with]
     end
   end
 end

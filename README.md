@@ -1,5 +1,5 @@
 # rescata
-Microlibrary for rescue exceptions declaratively for your Ruby classes.
+Microlibrary for rescue exceptions declaratively in your Ruby classes.
 
 Still in development...
 
