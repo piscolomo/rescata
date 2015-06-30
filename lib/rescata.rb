@@ -12,9 +12,21 @@ module Rescata
     end
 
     def method_added(method_name)
-      puts "added method #{method_name}"
       if rescues.keys.include? method_name
-        puts "method found in rescues!"
+        alias_method_name = "rescuing_old_#{method_name}"
+        unless instance_methods.include? alias_method_name.to_sym
+          send :alias_method, alias_method_name, method_name
+          send :define_method, method_name do
+            begin 
+              send(alias_method_name)
+            rescue
+              this = self
+              self.class.instance_eval do
+                this.send(rescues[method_name])
+              end
+            end
+          end
+        end
       end
     end
   end
