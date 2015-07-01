@@ -11,6 +11,9 @@ module Rescata
 
       raise ArgumentError, 'Rescuer method was not found, supply it with a hash with key :with as an argument' unless options[:with]
       rescues[method_name] = options[:with]
+      rescues = {
+        get_talks: :rescue_get_talks
+      }
     end
 
     def method_added(method_name)
@@ -22,7 +25,7 @@ module Rescata
           send :define_method, method_name do
             begin 
               send(alias_method_name)
-            rescue Exception => e
+            rescue StandardError => e
               instance_eval do
                 rescuer_arity =  method(rescuer_method).arity
                 rescuer_arity == 0 ? send(rescuer_method) : send(rescuer_method, e)
