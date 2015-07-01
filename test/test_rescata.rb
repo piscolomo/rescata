@@ -65,10 +65,10 @@ scope do
   test "rescue from a class error" do
     User = Class.new do
       include Rescata
-      rescata :get_talks, with: :rescue_get_talks, in: StandardError
+      rescata :get_talks, with: :rescue_get_talks, in: ArgumentError
 
       def get_talks
-        raise StandardError, "raised because i want"
+        raise ArgumentError, "raised because i want"
       end
 
       def rescue_get_talks
@@ -79,21 +79,22 @@ scope do
     assert_equal User.new.get_talks, "rescued!"
   end
 
-  # test "raise error if different class error raises" do
-  #   class User
-  #     rescata :get_talks, with: :rescue_get_talks, in: NameError
+  test "raise error if different class error raises" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: :rescue_get_talks, in: NameError
 
-  #     def get_talks
-  #       raise StandardError, "raised because i want"
-  #     end
+      def get_talks
+        raise StandardError, "raised because i want"
+      end
 
-  #     def rescue_get_talks
-  #       "rescued!"
-  #     end
-  #   end
+      def rescue_get_talks
+        "rescued!"
+      end
+    end
 
-  #   assert_raise(ArgumentError) do
-  #     User.new.get_talks
-  #   end
-  # end
+    assert_raise(StandardError) do
+      User.new.get_talks
+    end
+  end
 end
