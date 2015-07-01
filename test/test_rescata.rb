@@ -98,6 +98,24 @@ scope do
     end
   end
 
+  test "raise error if error class sent in array is not a class" do
+    assert_raise(ArgumentError) do
+      Class.new do
+        include Rescata
+        rescata :get_talks, with: :rescue_get_talks, in: [NameError, "whatever"]
+      end
+    end
+  end
+
+  test "raise error if error class sent in array is not a Exception class or subclass" do
+    assert_raise(ArgumentError) do
+      Class.new do
+        include Rescata
+        rescata :get_talks, with: :rescue_get_talks, in: [NameError, User]
+      end
+    end
+  end
+
   # test "rescue from a sent array of error classes" do
   #   User = Class.new do
   #     include Rescata
