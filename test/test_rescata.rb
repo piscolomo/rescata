@@ -68,7 +68,7 @@ scope do
       rescata :get_talks, with: :rescue_get_talks, in: ArgumentError
 
       def get_talks
-        raise ArgumentError, "raised because i want"
+        raise ArgumentError
       end
 
       def rescue_get_talks
@@ -85,7 +85,7 @@ scope do
       rescata :get_talks, with: :rescue_get_talks, in: NameError
 
       def get_talks
-        raise StandardError, "raised because i want"
+        raise StandardError
       end
 
       def rescue_get_talks
@@ -97,4 +97,21 @@ scope do
       User.new.get_talks
     end
   end
+
+  # test "rescue from a sent array of error classes" do
+  #   User = Class.new do
+  #     include Rescata
+  #     rescata :get_talks, with: :rescue_get_talks, in: [NameError, ArgumentError]
+
+  #     def get_talks
+  #       raise ArgumentError
+  #     end
+
+  #     def rescue_get_talks
+  #       "rescued!"
+  #     end
+  #   end
+
+  #   assert_equal User.new.get_talks, "rescued!"
+  # end
 end

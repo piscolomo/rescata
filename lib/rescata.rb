@@ -7,7 +7,12 @@ module Rescata
 
   module ClassMethods
     def rescata(method_name, options = {})
-      raise ArgumentError, 'Error class must be an Exception or sub-class' if options[:in] && (options[:in].is_a?(Class) ? (options[:in] <= Exception).nil? : true)
+      if options[:in]
+        error_classes = Array(options[:in])
+        error_classes.each do |klass|
+          raise ArgumentError, 'Error class must be an Exception or sub-class' if klass.is_a?(Class) ? (klass <= Exception).nil? : true
+        end
+      end
 
       raise ArgumentError, 'Rescuer method was not found, supply it with a hash with key :with as an argument' unless options[:with]
       rescues[method_name] ||= {}
