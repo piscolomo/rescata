@@ -1,20 +1,18 @@
 require File.expand_path("../lib/rescata", File.dirname(__FILE__))
 
 scope do
-  class User
-    include Rescata
-  end
-
   test "raise error if rescuer method is not sent" do
     assert_raise(ArgumentError) do
-      class User
+      Class.new do
+        include Rescata
         rescata :get_talks
       end
     end
   end
 
   test "rescue an error" do
-    class User
+    User = Class.new do
+      include Rescata
       rescata :get_talks, with: :rescue_get_talks
 
       def get_talks
@@ -29,9 +27,27 @@ scope do
     assert_equal User.new.get_talks, "rescued!"
   end
 
+  test "rescue an error passing the error variable" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: :rescue_get_talks
+
+      def get_talks
+        raise "i want"
+      end
+
+      def rescue_get_talks(e)
+        "rescued because #{e.message}"
+      end
+    end
+
+    assert_equal User.new.get_talks, "rescued because i want"
+  end
+
   test "raise error if error class sent is not a class" do
     assert_raise(ArgumentError) do
-      class User
+      Class.new do
+        include Rescata
         rescata :get_talks, with: :rescue_get_talks, in: "whatever"
       end
     end
@@ -39,14 +55,15 @@ scope do
 
   test "raise error if error class sent is not a Exception class or subclass" do
     assert_raise(ArgumentError) do
-      class User
+      Class.new do
+        include Rescata
         rescata :get_talks, with: :rescue_get_talks, in: User
       end
     end
   end
 
   # test "rescue from a class error" do
-  #   class User2
+  #   User = Class.new do
   #     include Rescata
   #     rescata :get_talks, with: :rescue_get_talks, in: StandardError
 
@@ -59,7 +76,7 @@ scope do
   #     end
   #   end
 
-  #   assert_equal User2.new.get_talks, "rescued!"
+  #   assert_equal User.new.get_talks, "rescued!"
   # end
 
   # test "raise error if different class error raises" do

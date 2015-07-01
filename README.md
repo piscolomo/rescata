@@ -9,10 +9,11 @@ Still in development...
 rescata :get_talks, with: :rescue_get_talks
 ```
 
-### Handling erros by error class
+### Handling errors by error class
 
 ```ruby
 rescata :get_talks, with: :rescue_get_talks, in: HTTParty::ConnectionError
+rescata :get_talks, with: :rescue_get_talks, in: [ArgumentError, HTTParty::ConnectionError]
 ```
 
 ### Rescuing with lambdas and blocks
