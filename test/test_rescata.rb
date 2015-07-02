@@ -88,7 +88,7 @@ scope do
     assert_equal User.new.get_talks, "rescued!"
   end
 
-  test "rescue from a class error passing error variable" do
+  test "rescue with method from a class error passing error variable" do
     User = Class.new do
       include Rescata
       rescata :get_talks, with: :rescue_get_talks, in: ArgumentError
@@ -142,7 +142,7 @@ scope do
     end
   end
 
-  test "rescue from a sent array of error classes" do
+  test "rescue with method from a sent array of error classes" do
     User = Class.new do
       include Rescata
       rescata :get_talks, with: :rescue_get_talks, in: [NameError, ArgumentError]
@@ -202,5 +202,91 @@ scope do
     end
 
     assert_equal User.new.get_talks, "rescued because i want"
+  end
+
+  test "rescue with proc from a class error passing error variable" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: lambda{|e| "rescued because #{e.message}"}, in: ArgumentError
+
+      def get_talks
+        raise ArgumentError, "i want"
+      end
+    end
+
+    assert_equal User.new.get_talks, "rescued because i want"
+  end
+
+  test "rescue with proc from a sent array of error classes" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: lambda{"rescued"}, in: [NameError, ArgumentError]
+
+      def get_talks
+        raise ArgumentError
+      end
+    end
+
+    assert_equal User.new.get_talks, "rescued"
+  end
+
+  test "rescue an error with block" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks do
+        "rescued"
+      end
+
+      def get_talks
+        raise "throwing an error"
+      end
+    end
+
+    assert_equal User.new.get_talks, "rescued"
+  end
+
+  test "rescue an error with block sending error variable" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks do |e|
+        "rescued because #{e.message}"
+      end
+
+      def get_talks
+        raise "i want"
+      end
+    end
+
+    assert_equal User.new.get_talks, "rescued because i want"
+  end
+
+  test "rescue with block from a class error passing error variable" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, in: ArgumentError do |e|
+        "rescued because #{e.message}"
+      end
+
+      def get_talks
+        raise ArgumentError, "i want"
+      end
+    end
+
+    assert_equal User.new.get_talks, "rescued because i want"
+  end
+
+  test "rescue with block from a sent array of error classes" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, in: [NameError, ArgumentError] do
+        "rescued"
+      end
+
+      def get_talks
+        raise ArgumentError
+      end
+    end
+
+    assert_equal User.new.get_talks, "rescued"
   end
 end

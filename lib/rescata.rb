@@ -6,7 +6,7 @@ module Rescata
   end
 
   module ClassMethods
-    def rescata(method_name, options = {})
+    def rescata(method_name, options = {}, &block)
       if options[:in]
         error_classes = Array(options[:in])
         error_classes.each do |klass|
@@ -14,6 +14,7 @@ module Rescata
         end
       end
 
+      options[:with] = block if block_given?
       raise ArgumentError, 'Rescuer is incorrectly, supply it like a Method or a Proc with a hash with key :with as an argument' unless options[:with] && (options[:with].is_a?(Symbol) || options[:with].is_a?(Proc))
 
       rescues[method_name] ||= {}
