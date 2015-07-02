@@ -10,7 +10,7 @@ scope do
     end
   end
 
-  test "rescue an error" do
+  test "rescue an error with method" do
     User = Class.new do
       include Rescata
       rescata :get_talks, with: :rescue_get_talks
@@ -27,7 +27,7 @@ scope do
     assert_equal User.new.get_talks, "rescued!"
   end
 
-  test "rescue an error passing the error variable" do
+  test "rescue an error with method passing the error variable" do
     User = Class.new do
       include Rescata
       rescata :get_talks, with: :rescue_get_talks
@@ -42,6 +42,15 @@ scope do
     end
 
     assert_equal User.new.get_talks, "rescued because i want"
+  end
+
+  test "raise if rescuer is not a method or a proc" do
+    assert_raise(ArgumentError) do
+      Class.new do
+        include Rescata
+        rescata :get_talks, with: "whatever"
+      end
+    end
   end
 
   test "raise if error class sent is not a class" do
@@ -167,5 +176,31 @@ scope do
     assert_raise(StandardError) do
       User.new.get_talks
     end
+  end
+
+  test "rescue an error with proc" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: lambda{"rescued"}
+
+      def get_talks
+        raise "throwing an error"
+      end
+    end
+
+    assert_equal User.new.get_talks, "rescued"
+  end
+
+  test "rescue an error with proc sending error variable" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: lambda{|e| "rescued because #{e.message}"}
+
+      def get_talks
+        raise "i want"
+      end
+    end
+
+    assert_equal User.new.get_talks, "rescued because i want"
   end
 end
