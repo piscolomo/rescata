@@ -489,4 +489,28 @@ scope do
     u.get_talks
     assert_equal u.x, 2
   end
+
+  test "ensure with a lambda" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: :rescue_get_talks, ensuring: lambda{|u| u.x += 1 }
+      
+      attr_accessor :x
+      def initialize
+        @x = 1
+      end
+
+      def get_talks
+        raise "throwing an error!"
+      end
+
+      def rescue_get_talks
+        "rescued!"
+      end
+    end
+
+    u = User.new
+    u.get_talks
+    assert_equal u.x, 2
+  end
 end

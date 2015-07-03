@@ -43,7 +43,7 @@ module Rescata
             rescuer.arity == 0 ? rescuer.call : rescuer.call(e)
           end
         ensure
-          send(ensurer) if ensurer
+          ensurer.is_a?(Symbol) ? send(ensurer) : ensurer.call(self) if ensurer
         end
       end
     end
