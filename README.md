@@ -29,7 +29,7 @@ end
 ### Rescuing multiple methods at once
 
 ```ruby
-rescata methods: [:get_talks, :other_method], with: :rescue_method
+rescata [:get_talks, :other_method], with: :rescue_method
 ```
 
 ### Ensure actions

@@ -6,7 +6,7 @@ module Rescata
   end
 
   module ClassMethods
-    def rescata(method_name, options = {}, &block)
+    def rescata(methods, options = {}, &block)
       error_classes = Array(options[:in])
       error_classes.each do |klass|
         raise ArgumentError, 'Error class must be an Exception or sub-class' if klass.is_a?(Class) ? (klass <= Exception).nil? : true
@@ -15,9 +15,11 @@ module Rescata
       options[:with] = block if block_given?
       raise ArgumentError, 'Rescuer is incorrectly, supply it like a Method or a Proc with a hash with key :with as an argument' unless options[:with] && (options[:with].is_a?(Symbol) || options[:with].is_a?(Proc))
 
-      rescues[method_name] ||= {}
-      rescues[method_name][:rescuer] = options[:with]
-      rescues[method_name][:error_class] = error_classes if options[:in]
+      Array(methods).each do |method_name|
+        rescues[method_name] ||= {}
+        rescues[method_name][:rescuer] = options[:with]
+        rescues[method_name][:error_class] = error_classes if options[:in]
+      end
     end
 
     def method_added(method_name)

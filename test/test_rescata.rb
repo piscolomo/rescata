@@ -330,4 +330,91 @@ scope do
     Student = Class.new(User)
     assert_equal Student.new.get_talks, "yep"
   end
+
+  test "rescuing multiples methods at once with a method" do
+    User = Class.new do
+      include Rescata
+      rescata [:get_talks, :other_method], with: :rescue_get_talks
+
+      def get_talks
+        raise "OH NOOO"
+      end
+
+      def other_method
+        raise "OH NOOO"
+      end
+
+      def rescue_get_talks
+        "yep"
+      end
+    end
+    assert_equal User.new.get_talks, "yep"
+    assert_equal User.new.other_method, "yep"
+  end
+
+  test "rescuing multiples methods at once with a method and particular class error" do
+    User = Class.new do
+      include Rescata
+      rescata [:get_talks, :other_method], with: :rescue_get_talks, in: ArgumentError
+
+      def get_talks
+        raise StandardError, "OH NOOO"
+      end
+
+      def other_method
+        raise ArgumentError, "OH NOOO"
+      end
+
+      def rescue_get_talks
+        "yep"
+      end
+    end
+
+    assert_raise(StandardError) do
+      User.new.get_talks
+    end
+    assert_equal User.new.other_method, "yep"
+  end
+
+  test "rescuing multiples methods at once with lambda and particular class error" do
+    User = Class.new do
+      include Rescata
+      rescata [:get_talks, :other_method], with: lambda{|e| "#{e.message} i want"}, in: ArgumentError
+
+      def get_talks
+        raise StandardError, "OH NOOO"
+      end
+
+      def other_method
+        raise ArgumentError, "raised because"
+      end
+    end
+
+    assert_raise(StandardError) do
+      User.new.get_talks
+    end
+    assert_equal User.new.other_method, "raised because i want"
+  end
+
+  test "rescuing multiples methods at once with block and particular class error" do
+    User = Class.new do
+      include Rescata
+      rescata [:get_talks, :other_method], in: ArgumentError do |e|
+        "#{e.message} i want"
+      end
+
+      def get_talks
+        raise StandardError, "OH NOOO"
+      end
+
+      def other_method
+        raise ArgumentError, "raised because"
+      end
+    end
+
+    assert_raise(StandardError) do
+      User.new.get_talks
+    end
+    assert_equal User.new.other_method, "raised because i want"
+  end
 end
