@@ -417,4 +417,48 @@ scope do
     end
     assert_equal User.new.other_method, "raised because i want"
   end
+
+  test "rescuing same method with multiple rescatas as first assert" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: :rescue_get_talks, in: StandardError
+      rescata :get_talks, with: :rescue_get_talks2, in: ArgumentError
+    
+      def get_talks
+        raise StandardError, "OH NOOO"
+      end
+
+      def rescue_get_talks
+        "yep"
+      end
+
+      def rescue_get_talks2
+        "yep2"
+      end
+    end
+
+    assert_equal User.new.get_talks, "yep"
+  end
+
+  test "rescuing same method with multiple rescatas as last assert" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: :rescue_get_talks, in: StandardError
+      rescata :get_talks, with: :rescue_get_talks2, in: ArgumentError
+    
+      def get_talks
+        raise ArgumentError, "OH NOOO"
+      end
+
+      def rescue_get_talks
+        "yep"
+      end
+
+      def rescue_get_talks2
+        "yep2"
+      end
+    end
+
+    assert_equal User.new.get_talks, "yep2"
+  end
 end
