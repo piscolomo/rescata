@@ -7,11 +7,9 @@ module Rescata
 
   module ClassMethods
     def rescata(method_name, options = {}, &block)
-      if options[:in]
-        error_classes = Array(options[:in])
-        error_classes.each do |klass|
-          raise ArgumentError, 'Error class must be an Exception or sub-class' if klass.is_a?(Class) ? (klass <= Exception).nil? : true
-        end
+      error_classes = Array(options[:in])
+      error_classes.each do |klass|
+        raise ArgumentError, 'Error class must be an Exception or sub-class' if klass.is_a?(Class) ? (klass <= Exception).nil? : true
       end
 
       options[:with] = block if block_given?
@@ -23,26 +21,22 @@ module Rescata
     end
 
     def method_added(method_name)
-      if rescues.keys.include? method_name
-        rescuer = rescues[method_name][:rescuer]
-        error_classes = rescues[method_name][:error_class]
-        alias_method_name = "rescuing_old_#{method_name}"
-        unless instance_methods.include? alias_method_name.to_sym
-          send :alias_method, alias_method_name, method_name
-          send :define_method, method_name do
-            begin 
-              send(alias_method_name)
-            rescue => e
-              raise e if error_classes && !error_classes.include?(e.class)
-              instance_eval do
-                case
-                when rescuer.is_a?(Symbol)
-                  method(rescuer).arity == 0 ? send(rescuer) : send(rescuer, e)
-                when rescuer.is_a?(Proc)
-                  rescuer.arity == 0 ? rescuer.call : rescuer.call(e)
-                end
-              end
-            end
+      return unless rescue_name = rescues[method_name]
+      rescuer = rescue_name[:rescuer]
+      error_classes = rescue_name[:error_class]
+      alias_method_name = :"rescuing_old_#{method_name}"
+      return if instance_methods.include?(alias_method_name)
+      alias_method alias_method_name, method_name
+      define_method method_name do
+        begin 
+          send(alias_method_name)
+        rescue => e
+          raise e if error_classes && !error_classes.include?(e.class)
+          case rescuer
+          when Symbol
+            method(rescuer).arity == 0 ? send(rescuer) : send(rescuer, e)
+          when Proc
+            rescuer.arity == 0 ? rescuer.call : rescuer.call(e)
           end
         end
       end
