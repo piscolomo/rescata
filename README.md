@@ -36,5 +36,5 @@ rescata [:get_talks, :other_method], with: :rescue_method
 
 ```ruby
 rescata :get_talks, with: :rescue_get_talks, ensuring: :ensuring_method
-rescata :get_talks, with: :rescue_get_talks, ensuring: lambda{|e| do_something }
+rescata :get_talks, with: :rescue_get_talks, ensuring: lambda{|instance| do_something }
 ```
