@@ -17,13 +17,12 @@ module Rescata
 
       Array(methods).each do |method_name|
         rescues[method_name] ||= []
-        rescues[method_name] << {rescuer: options[:with]}
-        rescues[method_name].last[:error_class] = error_classes if options[:in]
+        rescues[method_name] << {rescuer: options[:with]}.merge(options[:in] ? {error_class: error_classes} : {})
       end
     end
 
     def method_added(method_name)
-      return unless rescues && rescues_collection = rescues[method_name]
+      return unless rescues && collection = rescues[method_name]
       alias_method_name = :"rescuing_old_#{method_name}"
       return if instance_methods.include?(alias_method_name)
       alias_method alias_method_name, method_name
@@ -31,16 +30,14 @@ module Rescata
         begin 
           send(alias_method_name)
         rescue => e
-          handler = rescues_collection.select do |item|
-            item[:error_class] ? item[:error_class].include?(e.class) : true
-          end.first
+          handler = collection.select{|i| i[:error_class] ? i[:error_class].include?(e.class) : true }.first
           rescuer, error_classes = handler[:rescuer], handler[:error_class]
           raise e if error_classes && !error_classes.include?(e.class)
           case rescuer
           when Symbol
-            return method(rescuer).arity == 0 ? send(rescuer) : send(rescuer, e)
+            method(rescuer).arity == 0 ? send(rescuer) : send(rescuer, e)
           when Proc
-            return rescuer.arity == 0 ? rescuer.call : rescuer.call(e)
+            rescuer.arity == 0 ? rescuer.call : rescuer.call(e)
           end
         end
       end
