@@ -17,7 +17,10 @@ module Rescata
 
       Array(methods).each do |method_name|
         rescues[method_name] ||= []
-        rescues[method_name] << {rescuer: options[:with]}.merge(options[:in] ? {error_class: error_classes} : {})
+        rescues[method_name] << {
+          rescuer: options[:with]
+        }.merge(options[:in] ? {error_class: error_classes} : {})
+        .merge(options[:ensuring] ? {ensurer: options[:ensuring]} : {})
       end
     end
 
@@ -31,7 +34,7 @@ module Rescata
           send(alias_method_name)
         rescue => e
           handler = collection.select{|i| i[:error_class] ? i[:error_class].include?(e.class) : true }.first
-          rescuer, error_classes = handler[:rescuer], handler[:error_class]
+          rescuer, error_classes, ensurer = handler[:rescuer], handler[:error_class], handler[:ensurer]
           raise e if error_classes && !error_classes.include?(e.class)
           case rescuer
           when Symbol
@@ -39,6 +42,8 @@ module Rescata
           when Proc
             rescuer.arity == 0 ? rescuer.call : rescuer.call(e)
           end
+        ensure
+          send(ensurer) if ensurer
         end
       end
     end

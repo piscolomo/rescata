@@ -461,4 +461,32 @@ scope do
 
     assert_equal User.new.get_talks, "yep2"
   end
+
+  test "ensure with a method" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: :rescue_get_talks, ensuring: :ensure_method
+      
+      attr_accessor :x
+      def initialize
+        @x = 1
+      end
+
+      def get_talks
+        raise "throwing an error!"
+      end
+
+      def rescue_get_talks
+        "rescued!"
+      end
+
+      def ensure_method
+        @x += 1
+      end
+    end
+
+    u = User.new
+    u.get_talks
+    assert_equal u.x, 2
+  end
 end
