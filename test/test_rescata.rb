@@ -289,4 +289,45 @@ scope do
 
     assert_equal User.new.get_talks, "rescued"
   end
+
+  test "no screw up with child classes" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: :rescue_get_talks
+
+      def get_talks
+        raise "OH NOOO"
+      end
+
+      def rescue_get_talks
+        "yep"
+      end
+    end
+
+    Student = Class.new(User) do
+      def demo
+        "hi"
+      end
+    end
+    
+    assert_equal Student.new.demo, "hi"
+  end
+
+  test "rescuing from method of parent class" do
+    User = Class.new do
+      include Rescata
+      rescata :get_talks, with: :rescue_get_talks
+
+      def get_talks
+        raise "OH NOOO"
+      end
+
+      def rescue_get_talks
+        "yep"
+      end
+    end
+
+    Student = Class.new(User)
+    assert_equal Student.new.get_talks, "yep"
+  end
 end

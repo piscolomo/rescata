@@ -21,7 +21,7 @@ module Rescata
     end
 
     def method_added(method_name)
-      return unless rescue_name = rescues[method_name]
+      return unless rescues && rescue_name = rescues[method_name]
       rescuer = rescue_name[:rescuer]
       error_classes = rescue_name[:error_class]
       alias_method_name = :"rescuing_old_#{method_name}"
