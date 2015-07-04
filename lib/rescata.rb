@@ -18,7 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 module Rescata
-  VERSION = "0.1.0"
+  VERSION = "0.1.1"
 
   def self.included(base)
     class << base; attr_accessor :rescues; end
