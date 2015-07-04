@@ -17,7 +17,7 @@ Include Rescata in your Gemfile with gem 'rescata' or require it with require 'r
 
 ### Rescuing from errors
 
-After include `Rescata`, you can rescue any error inhirited from `StandardError` passing to `rescata` the method that you want to rescue if something is raised inside of it, and the method you want to execute(in `with` key) for rescue it(both method's names as a symbols).
+After include `Rescata`, you can rescue any error inherited from `StandardError` passing to `rescata` the method that you want to rescue if something is raised inside of it, and the method you want to execute(in `with` key) for rescue it(both method's names as symbols).
 
 ```ruby
 class User
@@ -34,8 +34,9 @@ class User
 end
 
 # Next line execute :rescuing_operation if a raise is launched inside of operation
+# The error will be rescued
 puts User.new.operation
-=> "do_something"
+#=> "do_something"
 ```
 
 You can get the error instance if your method derived to rescue can receive an argument.
@@ -55,7 +56,7 @@ class User
 end
 
 puts User.new.operation
-=> "is happening a problem"
+#=> "is happening a problem"
 ```
 
 ### Rescuing from an error class
@@ -72,7 +73,7 @@ class User
     raise "a problem"
   end
 
-  def operation2
+  def other_operation
     raise NameError, "other problem"
   end
 
@@ -83,11 +84,11 @@ end
 
 # This will be raise an error(in the example above we are just recuing 'operation' from ArgumentError)
 User.new.operation
-=> RuntimeError: a problem
+#=> RuntimeError: a problem
 
 # This will be rescued
 puts User.new.other_operation
-=> "is happening other problem"
+#=> "is happening other problem"
 ```
 
 Send an array if you want to rescue for two or more class errors.
@@ -108,7 +109,7 @@ end
 
 # This will be rescued because ArgumentError is included into the error classes specified
 puts User.new.operation
-=> "is happening other problem"
+#=> "is happening other problem"
 ```
 
 ### Rescuing using lambdas and blocks
@@ -137,17 +138,17 @@ end
 
 # both methods will rescued
 puts User.new.operation
-=> "is happening a problem"
+#=> "is happening a problem"
 
 puts User.new.other_operation
-=> "is happening other problem"
+#=> "is happening other problem"
 ```
 
 Also you can still rescuing from particular errors using lambdas or blocks. This gives you freedom to build any custom solution to rescue for specific error classes.
 
 ```ruby
 rescata :operation, with: :rescuing_operation, in: CustomError
-rescata :operation, in: RuntimeError, with: lambda{|e| do_something }
+rescata :operation, with: lambda{|e| do_something }, in: RuntimeError
 rescata :operation, in: [ArgumentError, NameError] do |e|
   do_something
 end
@@ -155,9 +156,10 @@ end
 
 ### Rescuing multiple methods at once
 
-Rescue from multiple methods in the same line if you have a lot of methods that you need to run the same action, just send them into an array as first variable of `rescata`.
+Rescue from multiple methods in the same line sending them into an array as first variable of `rescata`.
 
 ```ruby
+# Rescuing multiple methods in many ways
 rescata [:operation, :other_operation], with: :rescuing_operations
 rescata [:operation, :other_operation], with: lambda{|e| do_something }, in: CustomError
 rescata [:operation, :other_operation], in: [CustomError, NameError] do |e|
@@ -167,12 +169,13 @@ end
 
 ### Ensuring
 
-And we haven't forgotten the ensure actions, you can ensure your methods using `ensuring` key as a hash argument into `rescata`, you can ensure from a method or a lambda, this lambda will receive the instance of your class as a variable to do whatever you need.
+And we haven't forgotten the ensure actions, you can ensure your methods using `ensuring` key as a hash argument into `rescata`, you can ensure from a method or a lambda, if you opt for lambda it will receive the instance of your class as a variable to do whatever you need.
 
 ```ruby
 class User
-  include Rescata
   attr_accessor :name
+
+  include Rescata
   rescata :operation, with: :rescuing_operation, ensuring: :ensuring_method
   rescata :other_operation, with: :rescuing_operation, ensuring: lambda{|instance| instance.name = "Piero" }
 
@@ -201,10 +204,10 @@ end
 u = User.new("Julio")
 u.operation
 puts u.name
-=> "Piero"
+#=> "Piero"
 
 u = User.new("Julio")
 u.other_operation
 puts u.name
-=> "Piero"
+#=> "Piero"
 ```
