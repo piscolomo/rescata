@@ -39,7 +39,7 @@ puts User.new.operation
 #=> "do_something"
 ```
 
-You can get the error instance if your method derived to rescue can receive an argument.
+You can get the error instance if your method called to rescue can receive an argument.
 
 ```ruby
 class User
