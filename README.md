@@ -136,7 +136,7 @@ class User
   end
 end
 
-# both methods will rescued
+# both methods will be rescued
 puts User.new.operation
 #=> "is happening a problem"
 
@@ -200,7 +200,7 @@ class User
   end
 end
 
-# Both methods will rescued and executed its ensure actions
+# Both methods will be rescued and executed its ensure actions
 u = User.new("Julio")
 u.operation
 puts u.name
