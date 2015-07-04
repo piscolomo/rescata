@@ -143,7 +143,7 @@ puts User.new.other_operation
 => "is happening other problem"
 ```
 
-# Also you can still rescuing from particular errors using lambdas or blocks. This gives you freedom to build any custom solution to rescue for specific error classes.
+Also you can still rescuing from particular errors using lambdas or blocks. This gives you freedom to build any custom solution to rescue for specific error classes.
 
 ```ruby
 rescata :operation, with: :rescuing_operation, in: CustomError
