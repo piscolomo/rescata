@@ -188,7 +188,7 @@ class User
   end
 
   def other_operation
-    
+    raise "other problem"
   end
 
   def rescuing_operation
